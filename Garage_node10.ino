@@ -19,7 +19,7 @@
 #include <avr/sleep.h>
 #include "DHT.h"
 
-#define DHTPIN 8	// Garage Temp/Humidity
+#define DHTPIN 6	// Garage Temp/Humidity
 #define DHTPIN2 9	// Wormbox Temp/Humidity
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 
@@ -39,8 +39,8 @@ int RELAYPIN = 7;	// Relay located at DIO7
 boolean FLAG = 0;	// If 0, enter 90s 1.4v, if 1, enter 60s 5v
 
 // Garage Door Setup
-int garageDoorPin = 4;      // Garage Door open detect microswitch
-//int ledPin = 5;             // Garage Door open LED
+int garageDoorPin = A2;      // Garage Door open detect
+
 
 struct {
     int temp;			// garage temperature
@@ -49,7 +49,7 @@ struct {
     int hum2;			// wormbox humidity
     int co;	        	// Carbon Monoxide level
     byte garageDoorOpen;	// Garage Door open indicator switch
-    //int garageDoorOpen;
+    
 } payload;
 
 // this must be defined since we're using the watchdog for low-power waiting
@@ -58,10 +58,6 @@ ISR(WDT_vect) { Sleepy::watchdogEvent(); }
 void setup() {
     Serial.begin(9600);
     Serial.println("starting...");
-    
-    //pinMode(ledPin, OUTPUT);            // Garage Door indicator LED
-    pinMode(garageDoorPin, INPUT);      // garage door
-    digitalWrite(garageDoorPin, HIGH);  // enable pullup resistors
     
     dht.begin();			// Garage DHT22
     dht2.begin();			// Wormbox DHT22
@@ -88,6 +84,7 @@ static byte sendPayload () {
 
 
 void loop() {
+    
     if (FLAG == 0) {
 	Serial.println("Heater now at 1.4v");
 	digitalWrite(RELAYPIN, FLAG);
@@ -104,14 +101,14 @@ void loop() {
 	Serial.println(payload.co);
 	
 	// Garage Door
-	byte isTheDoorOpen = digitalRead(garageDoorPin);
-	if (isTheDoorOpen == 0){		
-	    //digitalWrite(ledPin, 1);		// garage door is open
-	    payload.garageDoorOpen = 0;
+	int isTheDoorOpen = analogRead(garageDoorPin);
+	Serial.print("garage door reading: ");
+	Serial.println(isTheDoorOpen);
+	if (isTheDoorOpen > 512){			
+	    payload.garageDoorOpen = 1;		// garage door is closed
 	}
-	else {
-	    //digitalWrite(ledPin, 0);		// garage door is open
-	    payload.garageDoorOpen = 1;
+	else {		
+	    payload.garageDoorOpen = 0;		// garage door is open
 	}
 	Serial.print("Garage Door: ");
 	Serial.println(payload.garageDoorOpen);
