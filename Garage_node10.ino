@@ -39,8 +39,8 @@ int RELAYPIN = 7;	// Relay located at DIO7
 boolean FLAG = 0;	// If 0, enter 90s 1.4v, if 1, enter 60s 5v
 
 // Garage Door Setup
-int garageDoorPin = A2;      // Garage Door open detect
-
+int garageDoorPin = A2;      	// Garage Door open detect
+int gdReading;
 
 struct {
     int temp;			// garage temperature
@@ -48,7 +48,9 @@ struct {
     int temp2;			// wormbox temperature
     int hum2;			// wormbox humidity
     int co;	        	// Carbon Monoxide level
+    int gd;			// test
     byte garageDoorOpen;	// Garage Door open indicator switch
+    
     
 } payload;
 
@@ -102,9 +104,11 @@ void loop() {
 	
 	// Garage Door
 	int isTheDoorOpen = analogRead(garageDoorPin);
+	gdReading = analogRead(garageDoorPin);	// test
+	payload.gd = gdReading;			// send Garage Door test
 	Serial.print("garage door reading: ");
 	Serial.println(isTheDoorOpen);
-	if (isTheDoorOpen > 512){			
+	if (isTheDoorOpen > 200){			
 	    payload.garageDoorOpen = 1;		// garage door is closed
 	}
 	else {		
