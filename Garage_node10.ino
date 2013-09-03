@@ -108,11 +108,11 @@ void loop() {
 	payload.gd = gdReading;			// send Garage Door test
 	Serial.print("garage door reading: ");
 	Serial.println(isTheDoorOpen);
-	if (isTheDoorOpen > 200){			
-	    payload.garageDoorOpen = 1;		// garage door is closed
+	if (isTheDoorOpen > 600){			
+	    payload.garageDoorOpen = 0;		// garage door is closed
 	}
 	else {		
-	    payload.garageDoorOpen = 0;		// garage door is open
+	    payload.garageDoorOpen = 1;		// garage door is open
 	}
 	Serial.print("Garage Door: ");
 	Serial.println(payload.garageDoorOpen);
